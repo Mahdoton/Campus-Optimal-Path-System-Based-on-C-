@@ -1,0 +1,375 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+using namespace std;
+
+#define MAXVEX  15          //顶点数，应由用户定义
+#define NUMBER  22          //边数，应由用户定义
+#define INF 9999999			//定义一个无穷大数
+
+typedef string VertexName;             //顶点名称应由用户定义
+typedef char replace;                  //顶点代号应由用户定义
+typedef string info;                   //顶点简介应由用户定义
+typedef struct {
+	VertexName name; //地点名称
+	replace ch; //地点代号
+	info str; //地点简介
+}Vexs;
+
+typedef int EdgeType;                  //边上的权值类型应由用户定义
+typedef struct {
+	Vexs vexs[MAXVEX];            //顶点表(以中文信息存储)结构体数组
+	EdgeType   arc[MAXVEX][MAXVEX];         //邻接矩阵，可看作边
+	int numVertexes, numEdges;      //图中当前的顶点数和边数
+}Graph;
+
+
+
+//事先把地图信息存储起来
+//地点名称
+VertexName vexname[15] = {
+	"振华楼",
+	"学院练车场",
+	"美食广场",
+	"春晖苑",
+	"学校游泳池",
+	"东区足球场",
+	"翔中堂",
+	"健身房",
+	"电工房",
+	"科技广场",
+	"生活服务中心",
+	"桃李苑",
+	"图书馆",
+	"田径场",
+	"体育馆"
+};
+//地点代号
+replace vexch[15] = {
+	'Z','L','M','H','Y','Q','X','J','D','K','S','T','G','C','P'
+};
+//地点简介
+info vexstr[15] = {
+	"振华楼是信息技术学院学员的主要活动场所，内置教室数百间，室内硬件配置齐全，当为模范教学楼！",
+	"学院练车场是与学校共同合作的一个校外商家，致力于为学生提供物美价廉的考驾照之旅，练车场位于校内，十分方便学生全天候练车！",
+	"美食广场位于广东理工学院东区区域，与春晖苑相邻，其中店家琳琅满目，数不胜数，风格深受学生欢迎，是校园的一处好栖息地！",
+	"春晖苑也被称之为东区食堂，与美食广场共同提供了学生们的日常餐饮生活，相对比与美食广场而言，春晖苑的装饰更为古风一些！",
+	"学校游泳池位于学校的东区区域，泳池是室内的，所以在任何时间段都十分适合学生下水，当然夏日泳池的plmm才是不可多得的一道风景线！",
+	"东区足球场，与学校游泳池相邻，有着良好的草地质感，给予运动员最舒适最安全的比赛场地，见证了无数广理足星的诞生！",
+	"翔中堂也被称之为礼堂，翔中堂主要作为大型活动的场地，内部有覆盖全场的空调，观众席十分豪华，并且座椅多达两层楼之多！",
+	"健身房位于礼堂的对角处，它是学生健身爱好者的天堂，内部硬件设施完善，安全设施齐全,如果店家可以免费让学生体验，再好不过了！",
+	"电工房位于校园的中间部分，当学生们宿舍发生电路问题时，都可以求助电工房来进行修理，当然电工一般是十分忙绿的，毕竟只有一所电工房！",
+	"科技广场是我校的重要场所，其广场里的科技之星雕塑更是我校的标示性建筑，寓意着师生不断创新，追求真理的科技之心！",
+	"生活服务中心也被学生们称之为西区超市，因为其建筑和超市并无两样，除此之外，最大的特色就是网红街，试想，一个宁静的夜晚，在满是星星灯下的你和好朋友们畅聊着星辰大海，是多么惬意的事情！",
+	"桃李苑位于西区区域，也称之为西区饭堂，不过其内部的装饰还是店家的款式，都比春晖苑要好一些！",
+	"图书馆位于我校正门的正前方，正所谓一进门就得以闻其书香气，图书馆是追求知识的天堂，里面有着一群志同道合，向往远方的青年少女，一起为自己的未来而去奋斗！",
+	"田径场是我校举行校运会的主要场地，有着400米的塑胶跑道，为西区的学生们提供了不可多得的课后锻炼场所！",
+	"体育馆与田径场相邻，这是我校唯一的室内运动馆，内有一个篮球场和四个羽毛球场，如果能再多一些室内场地，那将十分深受学生们的欢迎！",
+};
+
+
+//初始化地点名称1
+string loadingOne[22] = {
+	"振华楼",
+	"学院练车场",
+	"美食广场",
+	"振华楼",
+	"振华楼",
+	"振华楼",
+	"学校游泳池",
+	"东区足球场",
+	"学校游泳池",
+	"东区足球场",
+	"翔中堂",
+	"翔中堂",
+	"健身房",
+	"电工房",
+	"电工房",
+	"科技广场",
+	"科技广场",
+	"田径场",
+	"图书馆",
+	"图书馆",
+	"桃李苑",
+	"生活服务中心"
+};
+//初始化地点名称2
+string loadingTwo[22] = {
+	"学院练车场",
+	"美食广场",
+	"春晖苑",
+	"美食广场",
+	"春晖苑",
+	"学校游泳池",
+	"东区足球场",
+	"春晖苑",
+	"翔中堂",
+	"健身房",
+	"健身房",
+	"电工房",
+	"电工房",
+	"科技广场",
+	"生活服务中心",
+	"图书馆",
+	"田径场",
+	"体育馆",
+	"田径场",
+	"桃李苑",
+	"生活服务中心",
+	"图书馆"
+};
+//初始化地点路程
+int loadingNum[22] = {
+	30,10,5,20,
+	25,50,5,50,
+	30,35,7,20,
+	15,50,100,35,
+	10,5,10,20,
+	25,40
+};
+
+//定位
+int locates(Graph *g, string ch) {
+	int i = 0;
+	for (i = 0; i < g->numVertexes; i++) {
+		if (g->vexs[i].name == ch) {
+			break;
+		}
+	}
+	if (i >= g->numVertexes) {
+		return -1;
+	}
+	return i;
+}
+
+//建立一个无向网图的邻接矩阵表示
+void createGraph(Graph *g) {
+
+	int i, j, k, w;
+	//初始化顶点数和边数
+	g->numVertexes = MAXVEX; //15个顶点
+	g->numEdges = NUMBER;    //22条边
+
+							 //初始化广东理工学院地点名称、代号、简介
+	for (i = 0; i < g->numVertexes; i++) {
+		g->vexs[i].name = vexname[i];
+		g->vexs[i].ch = vexch[i];
+		g->vexs[i].str = vexstr[i];
+	}
+
+	//邻接矩阵初始化为每个单元为INF
+	for (i = 0; i < g->numVertexes; i++) {
+		for (j = 0; j < g->numVertexes; j++) {
+			g->arc[i][j] = INF;
+		}
+	}
+	cout << endl;
+
+	//初始化地图的各地点权值矩阵
+	for (k = 0; k < g->numEdges; k++) {
+		string p, q;
+		p = loadingOne[k];
+		q = loadingTwo[k];
+		w = loadingNum[k];
+		int m = -1;
+		int n = -1;
+		m = locates(g, p);//若m等于-1，说明在矩阵中并没有定位到
+		n = locates(g, q);
+		if (m == -1 || n == -1) {
+			cout << "there is no vertex." << endl; //显示输入有错信息
+			return;
+		}
+		g->arc[m][n] = w;
+		g->arc[n][m] = w; //因为是无向图，矩阵对称
+	}
+}
+
+//打印所有地点的基本信息
+void printGraph(Graph g) {
+	int i;
+	for (i = 0; i < g.numVertexes; i++) {
+		cout << "地点名称:" << g.vexs[i].name << endl;
+		cout << "代号:" << g.vexs[i].ch << endl;
+		cout << "简介:" << g.vexs[i].str << endl;
+		cout << endl;
+	}
+}
+
+//打印任一地点的基本信息
+void find(Graph g, string ch) {
+	int i;
+	for (i = 0; i < g.numVertexes; i++) {
+		if (ch == g.vexs[i].name) {
+			cout << "地点名称:" << g.vexs[i].name << endl;
+			cout << "代号:" << g.vexs[i].ch << endl;
+			cout << "简介:" << g.vexs[i].str << endl;
+			cout << endl;
+		}
+	}
+}
+
+//菜单栏
+void menum() {
+	cout << setw(75) << "欢迎来到广东理工学院智能地图查询系统" << endl;
+	cout << "您可进行以下操作，需要哪种操作请输入相对应的数字！" << endl;
+	cout << "1、查询广东理工学院所有地点信息" << endl;
+	cout << "2、查询广东理工学院任一地点的基本信息" << endl;
+	cout << "3、查询广东理工学院任两个地点间的最短路径和长度" << endl;
+	cout << "4、退出系统" << endl;
+}
+
+//输出任一两点间的最短路径与长度
+void disPath(int dist[], int path[], int vv, int ee, Graph g)//输出从源点v出发的所有最短路径
+{
+	int i, k;
+	//存放其顶点个数
+	int  d;
+	//存放一条最短路径（逆向）
+	string apath[MAXVEX];
+
+	cout << "从" << g.vexs[vv].name << "到" << g.vexs[ee].name << "的路径长度为:" << dist[ee] << "\t路径为：";
+
+	d = 0; apath[d] = g.vexs[ee].name;//源点到i的最短路径上的终点为i，终点i存放在apath[0]
+	k = path[ee];//源点到i的最短路径上，顶点i的前一个顶点为k
+	if (k == -1)
+		//没有路径的情况
+		cout << "无路径\n";
+	else//存在源点到i的最短路径时输出该路径
+	{
+		while (k != -1)//当k值等于源点编号时，循环结束
+		{
+			d++; apath[d] = g.vexs[k].name;//将源点v到i的最短路径上所经过的顶点编号，逆序存放在apath[d] 
+			k = path[k];
+		}
+		//d++; apath[d] = g.vexs[vv].name;//存储源点v到i的最短路径上的起点v
+
+		cout << apath[d];//先输出起点
+		for (i = d - 1; i >= 0; i--)//再输出其他顶点
+		{
+			cout << "->" << apath[i];
+		}
+	}
+}
+//求任一两地点之间的最短路径和长度
+void shortestPath(Graph g, int v, int e)
+
+{
+	int vv = v;
+	int ee = e;
+
+	//dist数组用来存储顶点v到顶点e的最短路径的长度，path数组用来存储初始点到各个顶点的最短路径上的前驱顶点
+	int dist[MAXVEX], path[MAXVEX];
+	//F数组用来表示顶点是否已求出最短路径，如果求出置为1，未求出置为0
+	int F[MAXVEX];
+
+	int mindis, i, j, u;
+
+	//对dist、path、F数组进行初始化
+	for (i = 0; i<g.numVertexes; i++)
+	{
+		//将起始点v到各个顶点之间的距离进行初始化
+		dist[i] = g.arc[v][i];
+
+		//F数组各个元素均置为0，均未求出最短路径
+		F[i] = 0;
+
+		if (g.arc[v][i]<INF) //路径初始化 等价于如果有边
+			path[i] = v;		 //顶点v到i有边时
+		else
+			path[i] = -1;		 //顶点v到i没边时
+	}
+	F[v] = 1;	 		 //源点v放入F中
+
+	for (i = 0; i<g.numVertexes; i++)	 	//循环n次
+	{
+		mindis = INF;
+		for (j = 0; j<g.numVertexes; j++)
+			//找出未求出最短路径中的顶点中距离源点v最近的点
+			if (F[j] == 0 && dist[j]<mindis)
+			{
+				u = j;
+				mindis = dist[j]; //令mindis存储dist数组中的最小值
+			}
+
+
+
+		//顶点u加入S中，因为此时u是距离源点最近的点，代表已求出最短路径
+		F[u] = 1;
+
+		//优化思路：如果F[ee]=1，那么就不用再更新dist数组和path数组的值了，也就是说终点的最短路径已求出
+		if (F[ee] != 1) {
+			for (j = 0; j < g.numVertexes; j++)		//修改不在s中的顶点的距离
+				if (F[j] == 0)
+					if (dist[u] + g.arc[u][j] < dist[j])
+					{
+						dist[j] = dist[u] + g.arc[u][j];
+						path[j] = u;
+					}
+		}
+		else {
+			break;
+		}
+	}
+
+	disPath(dist, path, vv, ee, g);		//输出最短路径
+
+	cout << endl;
+}
+
+//功能实现
+int function() {
+	Graph g;
+	Graph *ptr = &g;
+	createGraph(ptr); //邻接矩阵创建图
+	int  v, e;
+	int chose;
+	string str, start, end;
+	while (true) {
+		menum();
+		cout << endl;
+		cout << "请输入相应的数字编号" << endl;
+		cin >> chose;
+		switch (chose) {
+		case 1:
+			printGraph(g);
+			break;
+		case 2:
+			cout << "请输入待查地点的名称:";
+			cin >> str;
+			if (locates(ptr, str) == -1) {
+				cout << "查询地点发生错误,请重新操作!!!!" << endl;
+				break;
+			}
+			else {
+				find(g, str);
+			}
+			break;
+		case 3:
+			cout << "请输入任意两地的名称，名称之间用空格隔开，以回车结束：" << endl;
+			cin >> start >> end;
+			v = locates(ptr, start);
+			e = locates(ptr, end);
+			if (v == -1 || e == -1) {
+				cout << "查询地点发生错误,请重新操作!!!!" << endl;
+				break;
+			}
+			else {
+				shortestPath(g, v, e);
+			}
+			cout << endl;
+			break;
+		case 4:
+			cout << "感谢您的光临！" << endl;
+			return 0;
+		default:
+			cout << "操作数输入错误，请重新操作！" << endl;
+			break;
+		}
+		cin.ignore(100, '\n');
+	}
+}
+int main(int argc, char **argv) {
+	function();
+	system("pause");
+	return 0;
+}
